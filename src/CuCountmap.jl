@@ -1,5 +1,6 @@
 module CuCountmap
 
-greet() = print("Hello World!")
+include("countmap.jl")
+include("gpuradixsort.jl")
 
 end # module
