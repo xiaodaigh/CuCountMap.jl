@@ -1,8 +1,9 @@
 export gpuradixsort, gpuradixsort!
+
 using CUDA
 CUDA.allowscalar(false)
 
-const RADIX_SIZE = 8
+const RADIX_SIZE = 11
 const RADIX_MASK = UInt16(2^RADIX_SIZE-1)
 
 # The winner of bencharmks/bencharmks-countmap
