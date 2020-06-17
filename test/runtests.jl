@@ -1,6 +1,6 @@
-using CuCountmap
+using CuCountMap
 using Test
 
-@testset "CuCountmap.jl" begin
-    # Write your own tests here.
+@testset "CuCountMap.jl" begin
+    include("code.jl")
 end

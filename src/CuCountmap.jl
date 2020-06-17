@@ -1,4 +1,4 @@
-module CuCountmap
+module CuCountMap
 
 include("countmap.jl")
 include("gpuradixsort.jl")
