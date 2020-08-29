@@ -19,7 +19,7 @@ function cucountmap!(buffer, v::CuDeviceArray{T, 1, NN2}) where {T, NN2} #(buffe
     return
 end
 
-function countmap(v::CuArray{T, N, NN}; threads = 256, blocks = 1024) where {T, N, NN}
+function countmap(v::CuArray{T}; threads = 256, blocks = 1024) where {T}
     st = sizeof(T)
     @assert st <= 2
     buffer = CUDA.zeros(Int, 2^(8st))

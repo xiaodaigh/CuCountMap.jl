@@ -1,3 +1,5 @@
+"""Attempting to implement bitonic sort"""
+
 using CUDA
 
 # sort kernel

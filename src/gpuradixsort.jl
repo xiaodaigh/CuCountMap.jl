@@ -1,5 +1,7 @@
 export gpuradixsort, gpuradixsort!
 
+import SortingLab: fsort
+
 using CUDA
 CUDA.allowscalar(false)
 
@@ -23,9 +25,9 @@ function radixhist!(buffer, v::CuDeviceArray{T, 1, NN2}) where {T, NN2}
 end
 
 # count
-function radixhist(v::CuArray{T, N, NN}; threads = 256, blocks = 1024) where {T, N, NN}
+function radixhist(v::CuArray{T}; threads = 256, blocks = 1024) where {T}
     buffer = CUDA.zeros(Int, 2^RADIX_SIZE, ceil(Int, 8sizeof(T) / RADIX_SIZE))
-    @sync @cuda threads = threads blocks = blocks radixhist!(buffer, v)
+    CUDA.@sync @cuda threads = threads blocks = blocks radixhist!(buffer, v)
     for i in 1:ceil(Int, 8sizeof(T) / RADIX_SIZE)
         buffer[:, i] = cumsum(buffer[:, i])
     end
