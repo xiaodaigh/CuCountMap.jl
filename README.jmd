@@ -1,0 +1,59 @@
+## CuCountmap
+
+`cucountmap` is a faster `countmap` equivalent utilizing CUDA.jl  for `Vector{T}` where `isbits(T)` and `sizeof(T) <= 2`.
+
+### Usage
+
+```julia
+using CuCountMap
+
+v = rand(Int16, 1_000_000)
+
+cucountmap(v) # converts v to cu(v) and then run countmap
+
+using CUDA: cu
+
+cuv = cu(v)
+countmap(cuv) # StatsBase.countmap is overloaded for CuArrays
+```
+
+
+### Example & Benchmarks
+
+```julia
+using CUDA
+using CuCountMap
+using StatsBase: countmap
+
+v = rand(Int16, 10_000_000);
+
+using BenchmarkTools
+
+cpu_to_gpu_benchmark = @benchmark gpu_countmap = cucountmap($v)
+```
+
+```julia
+cpu_to_cpu_benchmark = @benchmark cpu_countmap = countmap($v)
+```
+
+```julia
+cuv = CUDA.cu(v)
+gpu_to_gpu_benchmark = @benchmark gpu_countmap2 = countmap(cuv)
+```
+
+#### Benchmark Plot
+
+```julia
+using Plots
+using Statistics: mean
+
+cpu_to_gpu = mean(cpu_to_gpu_benchmark.times)/1000/1000
+gpu_to_gpu = mean(gpu_to_gpu_benchmark.times)/1000/1000
+cpu_to_cpu = mean(cpu_to_cpu_benchmark.times)/1000/1000
+
+plot(
+["CPU Array on CPU \n countmap(v)", "convert CPU Array to GPU array on GPU \n cucountmap(cu(v))", "GPU array on GPU \n cucountmap(cuv)"],
+[cpu_to_cpu, cpu_to_gpu, gpu_to_gpu],
+seriestypes = :bar, title="CuCountMap.cucountmap vs StatsBase.countmap", label="ms",
+legendtitle="Mean time")
+```

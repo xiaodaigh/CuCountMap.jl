@@ -1,3 +1,5 @@
 .DS_Store
 /Manifest.toml
 /dev/
+/readme-env/
+README.jl
