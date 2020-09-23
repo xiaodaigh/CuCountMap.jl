@@ -1,4 +1,4 @@
-## CuCountmap
+## CuCountMap
 
 `cucountmap` is a faster `countmap` equivalent utilizing CUDA.jl  for `Vector{T}` where `isbits(T)` and `sizeof(T) <= 2`.
 
