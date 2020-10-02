@@ -1,7 +1,7 @@
 name = "CuCountMap"
 uuid = "7f9ef4d9-b8e2-47f5-be66-f1ea02ff3f4a"
 authors = ["ZJ <zhuojia.dai@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
@@ -9,7 +9,7 @@ SortingLab = "562c1548-17b8-5b69-83cf-d8aebec229f5"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
-CUDA = "1"
+CUDA = "1, 2"
 SortingLab = "0.2"
 StatsBase = "0.32, 0.33"
 julia = "1"
