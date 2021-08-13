@@ -4,8 +4,7 @@
 
 ### Usage
 
-````julia
-
+```julia
 using CuCountMap
 
 v = rand(Int16, 1_000_000)
@@ -16,32 +15,31 @@ using CUDA: cu
 
 cuv = cu(v)
 countmap(cuv) # StatsBase.countmap is overloaded for CuArrays
-````
+```
 
-
-````
-Dict{Int16,Int64} with 65536 entries:
-  -13838 => 17
-  22035  => 12
-  -15285 => 19
-  -13843 => 12
-  -18190 => 19
-  -20309 => 11
-  19698  => 11
-  -8633  => 20
-  -17455 => 12
-  -16936 => 22
-  29981  => 14
-  -20376 => 15
-  7237   => 20
-  -27415 => 10
-  17959  => 17
-  27248  => 17
-  -32758 => 17
-  -13400 => 17
-  5784   => 10
+```
+Dict{Int16, Int64} with 65536 entries:
+  -23731 => 18
+  29965  => 13
+  30270  => 14
+  1703   => 17
+  7685   => 16
+  -7029  => 16
+  3406   => 12
+  -30706 => 18
+  28804  => 10
+  27640  => 14
+  -17985 => 18
+  -28261 => 12
+  -2851  => 19
+  2015   => 12
+  -25023 => 15
+  31375  => 16
+  -13631 => 15
+  -8219  => 19
+  28165  => 14
   ⋮      => ⋮
-````
+```
 
 
 
@@ -50,8 +48,7 @@ Dict{Int16,Int64} with 65536 entries:
 
 ### Example & Benchmarks
 
-````julia
-
+```julia
 using CUDA
 using CuCountMap
 using StatsBase: countmap
@@ -61,67 +58,63 @@ v = rand(Int16, 10_000_000);
 using BenchmarkTools
 
 cpu_to_gpu_benchmark = @benchmark gpu_countmap = cucountmap($v)
-````
+```
 
+```
+BenchmarkTools.Trial: 954 samples with 1 evaluation.
+ Range (min … max):  4.374 ms … 13.528 ms  ┊ GC (min … max): 0.00% … 52.22%
+ Time  (median):     4.814 ms              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   5.151 ms ±  1.145 ms  ┊ GC (mean ± σ):  3.24% ±  8.90%
 
-````
-BenchmarkTools.Trial: 
-  memory estimate:  4.17 MiB
-  allocs estimate:  76
-  --------------
-  minimum time:     4.751 ms (0.00% GC)
-  median time:      4.974 ms (0.00% GC)
-  mean time:        5.320 ms (3.50% GC)
-  maximum time:     14.950 ms (55.27% GC)
-  --------------
-  samples:          940
-  evals/sample:     1
-````
+   ██                                                         
+  ▅██▇▇▇▆▅▄▄▄▄▃▃▃▃▃▂▂▂▂▁▂▂▂▁▁▁▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂▂ ▃
+  4.37 ms        Histogram: frequency by time        11.3 ms <
+
+ Memory estimate: 2.38 MiB, allocs estimate: 103.
+```
 
 
 
-````julia
-
+```julia
 cpu_to_cpu_benchmark = @benchmark cpu_countmap = countmap($v)
-````
+```
+
+```
+BenchmarkTools.Trial: 291 samples with 1 evaluation.
+ Range (min … max):  15.864 ms … 26.632 ms  ┊ GC (min … max): 0.00% … 18.12
+%
+ Time  (median):     16.843 ms              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   17.195 ms ±  1.444 ms  ┊ GC (mean ± σ):  1.72% ±  5.17
+%
+
+      ▃ ▅██▆▄▁                                                 
+  ▃█▇▆████████▇▇▄▃▃▂▂▂▂▁▁▁▁▂▁▂▁▂▂▁▁▁▁▂▂▁▂▁▄▁▁▁▂▁▁▂▁▂▂▁▁▁▄▁▃▁▂ ▃
+  15.9 ms         Histogram: frequency by time        22.6 ms <
+
+ Memory estimate: 4.17 MiB, allocs estimate: 37.
+```
 
 
-````
-BenchmarkTools.Trial: 
-  memory estimate:  4.17 MiB
-  allocs estimate:  37
-  --------------
-  minimum time:     14.915 ms (0.00% GC)
-  median time:      15.344 ms (0.00% GC)
-  mean time:        15.670 ms (1.06% GC)
-  maximum time:     22.093 ms (28.90% GC)
-  --------------
-  samples:          320
-  evals/sample:     1
-````
 
-
-
-````julia
-
+```julia
 cuv = CUDA.cu(v)
 gpu_to_gpu_benchmark = @benchmark gpu_countmap2 = countmap(cuv)
-````
+```
 
+```
+BenchmarkTools.Trial: 2242 samples with 1 evaluation.
+ Range (min … max):  1.799 ms …   9.377 ms  ┊ GC (min … max): 0.00% … 73.02
+%
+ Time  (median):     1.995 ms               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   2.150 ms ± 643.115 μs  ┊ GC (mean ± σ):  3.50% ±  8.43
+%
 
-````
-BenchmarkTools.Trial: 
-  memory estimate:  4.17 MiB
-  allocs estimate:  64
-  --------------
-  minimum time:     2.512 ms (0.00% GC)
-  median time:      2.692 ms (0.00% GC)
-  mean time:        2.984 ms (5.91% GC)
-  maximum time:     17.421 ms (73.12% GC)
-  --------------
-  samples:          1675
-  evals/sample:     1
-````
+   █▃                                                          
+  ▄███▄▅▅▄▄▃▃▂▂▂▂▂▂▂▁▁▂▂▁▁▁▂▁▁▁▁▁▁▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂▂▂▂▂ ▂
+  1.8 ms          Histogram: frequency by time        5.82 ms <
+
+ Memory estimate: 2.38 MiB, allocs estimate: 134.
+```
 
 
 
@@ -129,8 +122,7 @@ BenchmarkTools.Trial:
 
 #### Benchmark Plot
 
-````julia
-
+```julia
 using Plots
 using Statistics: mean
 
@@ -143,7 +135,11 @@ plot(
 [cpu_to_cpu, cpu_to_gpu, gpu_to_gpu],
 seriestypes = :bar, title="CuCountMap.cucountmap vs StatsBase.countmap", label="ms",
 legendtitle="Mean time")
-````
+```
+
+```
+[ Info: Precompiling Plots [91a5bcdd-55d7-5caf-9e0b-520d859cae80]
+```
 
 
 ![](figures/README_5_1.png)

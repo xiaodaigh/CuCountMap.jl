@@ -14,7 +14,7 @@ function cucountmap!(buffer, v::CuDeviceArray{T, 1, NN2}) where {T, NN2} #(buffe
     addnum = 1 - Int(typemin(T))
     for j = i:stride:length(v)
         b = Int(v[j]) + addnum
-        @atomic buffer[b] = buffer[b] + 1
+        CUDA.@atomic buffer[b] = buffer[b] + 1
     end
     return
 end

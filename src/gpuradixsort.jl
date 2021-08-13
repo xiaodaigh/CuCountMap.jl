@@ -1,34 +1,45 @@
 export gpuradixsort, gpuradixsort!
 
-import SortingLab: fsort
-
 using CUDA
-CUDA.allowscalar(false)
+# CUDA.allowscalar(false)
 
 const RADIX_SIZE = 11
 const RADIX_MASK = UInt16(2^RADIX_SIZE-1)
 
 # The winner of bencharmks/bencharmks-countmap
-function radixhist!(buffer, v::CuDeviceArray{T, 1, NN2}) where {T, NN2}
+function radixhist!(buffer, v, number_of_radix)
     i = (blockIdx().x - 1) * blockDim().x + threadIdx().x
     stride = gridDim().x * blockDim().x
 
-    for k in 1:ceil(Int, 8sizeof(T) / RADIX_SIZE)
+    local_buffer = CUDA.zeros(2^RADIX_SIZE, number_of_radix)
+
+    for k in 1:number_of_radix
         for j = i:stride:length(v)
             bits_to_shift = (k-1)*RADIX_SIZE
             vj_shifted = v[j] >> bits_to_shift
             b = Int(vj_shifted & RADIX_MASK) + 1
-            @atomic buffer[b, k] = buffer[b, k] + 1
+
+            local_buffer[b, k] += 1
         end
     end
+
+    for k in 1:number_of_radix
+        for i in 1:2^RADIX_SIZE
+            CUDA.@atomic buffer[i, k] = buffer[i, k] + local_buffer[i, k]
+        end
+    end
+
     return
 end
 
 # count
 function radixhist(v::CuArray{T}; threads = 256, blocks = 1024) where {T}
-    buffer = CUDA.zeros(Int, 2^RADIX_SIZE, ceil(Int, 8sizeof(T) / RADIX_SIZE))
-    CUDA.@sync @cuda threads = threads blocks = blocks radixhist!(buffer, v)
-    for i in 1:ceil(Int, 8sizeof(T) / RADIX_SIZE)
+    number_of_radix = ceil(Int, 8sizeof(T) / RADIX_SIZE)
+
+    buffer = CUDA.zeros(Int, 2^RADIX_SIZE, number_of_radix)
+    CUDA.@sync @cuda threads = threads blocks = blocks radixhist!(buffer, v, number_of_radix)
+
+    for i in 1:number_of_radix
         buffer[:, i] = cumsum(buffer[:, i])
     end
     buffer
